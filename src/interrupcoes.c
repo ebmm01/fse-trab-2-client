@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include "interrupcoes.h"
 
-int sensorPins[] = {
+static int sensorPins[] = {
     SENSOR_PRESENCA_SALA, // GPIO 25
     SENSOR_PRESENCA_COZINHA,  // GPIO 26
     SENSOR_ABERTURA_PORTA_COZINHA,  // GPIO 5
@@ -20,7 +20,7 @@ int sensorPins[] = {
 
 volatile int sensorData[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-struct timeval last_changes[8];
+static struct timeval last_changes[8];
 
 struct timeval get_now() {
     struct timeval now;
@@ -182,32 +182,30 @@ void handle_7() {
     last_changes[7] = now;
 }
 
+void (*func_ptr[8])() = { handle_0, handle_1, handle_2, handle_3, handle_4, handle_5, handle_6, handle_7 };
+
 void* init_interruptions_handler() {
 
     wiringPiSetup();
     
 
-    for (int i = 0; i < sizeof(sensorPins); i++) {
+    printf("\nPINMODE:: \n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d ", sensorPins[i]);
         pinMode(sensorPins[i], OUTPUT);
     }
 
-    gettimeofday(&last_changes[0], NULL);
-    gettimeofday(&last_changes[1], NULL);
-    gettimeofday(&last_changes[2], NULL);
-    gettimeofday(&last_changes[3], NULL);
-    gettimeofday(&last_changes[4], NULL);
-    gettimeofday(&last_changes[5], NULL);
-    gettimeofday(&last_changes[6], NULL);
-    gettimeofday(&last_changes[7], NULL);
+    printf("\ngettimeofday:: \n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d ", sensorPins[i]);
+        gettimeofday(&last_changes[i], NULL);
+    }
 
-    wiringPiISR(sensorPins[0], INT_EDGE_BOTH, &handle_0);
-    wiringPiISR(sensorPins[1], INT_EDGE_BOTH, &handle_1);
-    wiringPiISR(sensorPins[2], INT_EDGE_BOTH, &handle_2);
-    wiringPiISR(sensorPins[3], INT_EDGE_BOTH, &handle_3);
-    wiringPiISR(sensorPins[4], INT_EDGE_BOTH, &handle_4);
-    wiringPiISR(sensorPins[5], INT_EDGE_BOTH, &handle_5);
-    wiringPiISR(sensorPins[6], INT_EDGE_BOTH, &handle_6);
-    wiringPiISR(sensorPins[7], INT_EDGE_BOTH, &handle_7);
+    printf("\nwiringPiISR:: \n");
+    for (int i = 0; i < 8; i++) {
+        printf("%d ", sensorPins[i]);
+        wiringPiISR(sensorPins[i], INT_EDGE_BOTH, func_ptr[i]);
+    }
 
     updateSensorData();
 
@@ -217,7 +215,7 @@ void* init_interruptions_handler() {
 
 void updateSensorData() {
 
-    for (int i = 0; i < sizeof(sensorPins); i++) {
+    for (int i = 0; i < 8; i++) {
         sensorData[i] = digitalRead(sensorPins[i]);
     }
 }

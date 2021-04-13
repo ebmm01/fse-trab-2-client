@@ -46,7 +46,7 @@ void handle_init() {
 
     //init_socket();
 
-    if (!bme280Init(0x76))
+    if (bme280Init(0x76))
 	{
         printf("\nErro ao iniciar BME. Encerrando...\n");
 		exit(1); // problem - quit
