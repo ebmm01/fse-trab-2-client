@@ -35,7 +35,6 @@ void handle_file_creation() {
     char file_location[35];
     memcpy(file_location, handle_filename(), sizeof(char) * 35);
 
-    printf("%s\n", file_location );
     fp = fopen(file_location, "r");
 
     if(fp == NULL)
@@ -47,6 +46,4 @@ void handle_file_creation() {
     else {
         fclose(fp);
     }
-
-    printf("Arquivos escritos\n" );
 }
