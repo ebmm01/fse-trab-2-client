@@ -6,6 +6,8 @@
 #include <string.h>
 #include <sys/time.h>
 #include "interrupcoes.h"
+#include "socket.h"
+#include "events.h"
 
 static int sensorPins[] = {
     SENSOR_PRESENCA_SALA, // GPIO 25
@@ -30,6 +32,14 @@ struct timeval get_now() {
     return now;
 }
 
+void send_to_server(char* sensor, int sensor_value) {
+    char message[200];
+
+    sprintf(message, "%s;%s;%i", SENSOR_CHANGE, sensor, sensor_value);
+
+    send_message_to_server(message, strlen(message) + 1);
+}
+
 void handle_0() {
     unsigned long diff;
 
@@ -44,6 +54,8 @@ void handle_0() {
         else 
             printf("SENSOR_PRESENCA_SALA Rising\n");
         sensorData[0] = !sensorData[0];
+
+        send_to_server("SENSOR_PRESENCA_SALA", sensorData[0]);
     }
 
     last_changes[0] = now;
@@ -63,6 +75,8 @@ void handle_1() {
         else 
             printf("SENSOR_PRESENCA_COZINHA Rising\n");
         sensorData[1] = !sensorData[1];
+
+        send_to_server("SENSOR_PRESENCA_COZINHA", sensorData[1]);
     }
 
     last_changes[1] = now;
@@ -82,6 +96,8 @@ void handle_2() {
         else 
             printf("SENSOR_ABERTURA_PORTA_COZINHA Rising\n");
         sensorData[2] = !sensorData[2];
+
+        send_to_server("SENSOR_ABERTURA_PORTA_COZINHA", sensorData[2]);
     }
 
     last_changes[2] = now;
@@ -101,6 +117,8 @@ void handle_3() {
         else 
             printf("SENSOR_ABERTURA_JANELA_COZINHA Rising\n");
         sensorData[3] = !sensorData[3];
+
+        send_to_server("SENSOR_ABERTURA_JANELA_COZINHA", sensorData[3]);
     }
 
     last_changes[3] = now;
@@ -120,6 +138,8 @@ void handle_4() {
         else 
             printf("SENSOR_ABERTURA_PORTA_SALA Rising\n");
         sensorData[4] = !sensorData[4];
+
+        send_to_server("SENSOR_ABERTURA_PORTA_SALA", sensorData[4]);
     }
 
     last_changes[4] = now;
@@ -139,6 +159,8 @@ void handle_5() {
         else 
             printf("SENSOR_ABERTURA_JANELA_SALA Rising\n");
         sensorData[5] = !sensorData[5];
+
+        send_to_server("SENSOR_ABERTURA_JANELA_SALA", sensorData[5]);
     }
 
     last_changes[5] = now;
@@ -158,6 +180,8 @@ void handle_6() {
         else 
             printf("SENSOR_ABERTURA_JANELA_QUARTO_01 Rising\n");
         sensorData[6] = !sensorData[6];
+
+        send_to_server("SENSOR_ABERTURA_JANELA_QUARTO_01", sensorData[6]);
     }
 
     last_changes[6] = now;
@@ -177,6 +201,8 @@ void handle_7() {
         else 
             printf("SENSOR_ABERTURA_JANELA_QUARTO_02 Rising\n");
         sensorData[7] = !sensorData[7];
+
+        send_to_server("SENSOR_ABERTURA_JANELA_QUARTO_02", sensorData[7]);
     }
 
     last_changes[7] = now;
@@ -185,25 +211,16 @@ void handle_7() {
 void (*func_ptr[8])() = { handle_0, handle_1, handle_2, handle_3, handle_4, handle_5, handle_6, handle_7 };
 
 void* init_interruptions_handler() {
-
-    wiringPiSetup();
     
-
-    printf("\nPINMODE:: \n");
     for (int i = 0; i < 8; i++) {
-        printf("%d ", sensorPins[i]);
         pinMode(sensorPins[i], OUTPUT);
     }
 
-    printf("\ngettimeofday:: \n");
     for (int i = 0; i < 8; i++) {
-        printf("%d ", sensorPins[i]);
         gettimeofday(&last_changes[i], NULL);
     }
 
-    printf("\nwiringPiISR:: \n");
     for (int i = 0; i < 8; i++) {
-        printf("%d ", sensorPins[i]);
         wiringPiISR(sensorPins[i], INT_EDGE_BOTH, func_ptr[i]);
     }
 

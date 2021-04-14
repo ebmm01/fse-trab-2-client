@@ -194,3 +194,12 @@ int bme280ReadValues(int *T, int *P, int *H)
 	return 0;
 
 } /* bme280ReadValues() */
+
+void get_temperature_and_humidity(float *temperature, float *humidity) {
+	int T, P, H;
+
+	bme280ReadValues(&T, &P, &H);
+
+	*temperature = (float) T/100;
+	*humidity = (float) H/836;
+}

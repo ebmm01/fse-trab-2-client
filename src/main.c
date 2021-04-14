@@ -1,40 +1,35 @@
 #include <stdio.h>
 #include <unistd.h>         //Used for UART
+#include <wiringPi.h> /* include wiringPi library */
 #include <signal.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include "bme280.h"
 #include "socket.h"
+#include "gpio.h"
 #include "csv.h"
 #include "interrupcoes.h"
+#include "update_temp.h"
 
 void handle_init();
 void handle_close();
-pthread_t thread_interruptions;
+pthread_t thread_interruptions, thread_sockets;
 
 int main(int argc, const char * argv[]) {
+    
     handle_init();
 
-    int T, P, H;
-
     signal(SIGINT, handle_close);
+    signal(SIGPIPE, SIG_IGN);
 
     pthread_create(&thread_interruptions, NULL, &init_interruptions_handler, NULL);
     pthread_detach(thread_interruptions);
-
+    
+    pthread_create(&thread_sockets, NULL, &handle_socket_received_messages, NULL);
+    pthread_detach(thread_sockets);
     
     while(1) {
-        bme280ReadValues(&T, &P, &H);
-        updateSensorData();
-        
-        // printf("Calibrated temp. = %.2f C, hum. = %.2f\n", (float)T/100.0, (float)H/836.0);
-        // // printf("Printando dados sensores\n");
-        // for (int i = 0; i < 8; i++) {
-        //     printf("%d ", sensorData[i]);
-        // }
-        // printf("\n");
-        
-        write_csv_on_file((float)T/100.0, (float)H/1024.0);
+        handle_temp_and_humidity();
         sleep(1);
     }
 
@@ -44,8 +39,12 @@ int main(int argc, const char * argv[]) {
 void handle_init() {
     printf("\nIniciando execução, aguarde...\n");
 
-    //init_socket();
+    init_socket();
 
+    /* initialize wiringPi setup */
+    wiringPiSetup();		
+
+    /* initialize bme280 setup */
     if (bme280Init(0x76))
 	{
         printf("\nErro ao iniciar BME. Encerrando...\n");
@@ -54,7 +53,17 @@ void handle_init() {
     else 
         printf("BME280 aberto com sucesso.\n");
 
+    /* initialize output devices */
+    init_gpio_device(LAMPADA_COZINHA);
+    init_gpio_device(LAMPADA_SALA);
+    init_gpio_device(LAMPADA_QUARTO_01);
+    init_gpio_device(LAMPADA_QUARTO_02);
+    init_gpio_device(AR_CONDICIONADO_QUARTO_01);
+    init_gpio_device(AR_CONDICIONADO_QUARTO_02);
+
+    /* handle csv files */
     handle_file_creation();
+
     sleep(1);
 }
 
@@ -62,6 +71,7 @@ void handle_close() {
     printf("\nEncerrando execução...\n");
 
     pthread_cancel(thread_interruptions);
-    //close_socket();
+    pthread_cancel(thread_sockets);
+    close_socket();
     exit(0);
 }

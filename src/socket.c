@@ -9,31 +9,57 @@
 #include <arpa/inet.h>    // htons(), inet_addr()
 #include <unistd.h>       // close()
 
+#include "socket_handler.h"
+
 #define MAX 80
 #define PORT 9011
 #define SA struct sockaddr
 #define SERVER_IP "192.168.0.53"
+#define MESSAGE_WAIT_TIME_USECONDS 100000
+
 
 int sockfd;
 
-void* func()
+void* handle_socket_received_messages()
 {
+    int dc_times = 0;
+
     char buff[MAX];
+
     for (;;) {
         bzero(buff, sizeof(buff));
-        int result = send(sockfd, "TEMP; 21,12\n", sizeof(buff), 0);
 
-        if (result) {
-            printf("Mensagem enviada...\n");
+        // Receive client's message:
+        if (recv(sockfd, buff, sizeof(buff), 0) < 0){
+            dc_times++;
         }
-        else 
-            printf("Erro ao enviar msg\n");
+        else if (buff[0] == '\0') {
+            dc_times++;
+        }
+        else {
+            handle_socket_message(buff);
+            printf("Msg from server: %s\n",  buff);
+        }
 
-        usleep(500000);
+        usleep(MESSAGE_WAIT_TIME_USECONDS);
     }
 
     return 0;
 }
+
+void send_message_to_server(char* message, int messageSize) {
+    if (sockfd == -1) {
+       printf("Erro ao enviar msg. Socket não conectado...\n"); 
+    }
+    else {
+        int result = send(sockfd, message, messageSize, 0);
+
+        if (!result) {
+            printf("Erro ao enviar msg\n");
+        }
+            
+    }
+};
 
 void close_socket() {
     close(sockfd);

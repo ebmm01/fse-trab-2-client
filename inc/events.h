@@ -1,0 +1,8 @@
+#ifndef EVENTS_H
+#define EVENTS_H
+
+#define UPDATE_TEMP_EVENT "UPDATE_TEMP"
+#define SENSOR_CHANGE "SENSOR_CHANGE"
+#define SERVER_CLOSED "SERVER_CLOSED"
+
+#endif /* EVENTS_H */
