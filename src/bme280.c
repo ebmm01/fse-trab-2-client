@@ -26,7 +26,7 @@ static int calH1, calH2, calH3, calH4, calH5, calH6;
 // reads the calibration data and sets the device
 // into auto sensing mode
 //
-int bme280Init(int iAddr)
+int bme280_init(int iAddr)
 {
     int i, rc;
     unsigned char ucTemp[32];
@@ -136,7 +136,7 @@ int bme280Init(int iAddr)
 // Pressure is <future>
 // Humidity is express as H * 1024 (10 bit fraction)
 //
-int bme280ReadValues(int *T, int *P, int *H)
+int bme280_read_values(int *T, int *P, int *H)
 {
     unsigned char ucTemp[16];
     int i,rc;
@@ -198,7 +198,7 @@ int bme280ReadValues(int *T, int *P, int *H)
 void get_temperature_and_humidity(float *temperature, float *humidity) {
 	int T, P, H;
 
-	bme280ReadValues(&T, &P, &H);
+	bme280_read_values(&T, &P, &H);
 
 	*temperature = (float) T/100;
 	*humidity = (float) H/836;

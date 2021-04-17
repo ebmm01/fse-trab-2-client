@@ -17,6 +17,8 @@ extern volatile int sensorData[];
 
 void* init_interruptions_handler();
 
-void updateSensorData();
+void update_sensor_data();
+
+void send_sensor_data_to_server();
 
 #endif /* INTERRUPCOES_H_ */

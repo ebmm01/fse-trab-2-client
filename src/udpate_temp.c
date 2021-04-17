@@ -3,6 +3,7 @@
 #include "bme280.h"
 #include "socket.h"
 #include "events.h"
+#include <string.h>
 
 float T, H;
 
@@ -14,5 +15,5 @@ void handle_temp_and_humidity() {
 
     sprintf(message, "%s;%.2f;%.2f", UPDATE_TEMP_EVENT, T, H);
     
-    send_message_to_server(message, sizeof(message));
+    send_message_to_server(message, strlen(message));
 }

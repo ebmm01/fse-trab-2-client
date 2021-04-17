@@ -12,7 +12,7 @@
 #include "socket_handler.h"
 
 #define MAX 80
-#define PORT 9011
+#define PORT 10003
 #define SA struct sockaddr
 #define SERVER_IP "192.168.0.53"
 #define MESSAGE_WAIT_TIME_USECONDS 100000
@@ -20,16 +20,42 @@
 
 int sockfd;
 
+int init_socket()
+{
+    struct sockaddr_in servaddr;
+  
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("Falha ao criar socket...\n");
+        exit(0);
+    }
+    else
+        printf("Socket criado com sucesso!\n");
+    bzero(&servaddr, sizeof(servaddr));
+  
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+    servaddr.sin_port = htons(PORT);
+  
+    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
+        printf("Conexão com o servidor central falhou\n");
+        exit(0);
+    }
+    else
+        printf("Conectado ao servidor central\n");
+
+    return 0;
+}
+
 void* handle_socket_received_messages()
 {
     int dc_times = 0;
 
     char buff[MAX];
 
-    for (;;) {
+    while(1) {
         bzero(buff, sizeof(buff));
 
-        // Receive client's message:
         if (recv(sockfd, buff, sizeof(buff), 0) < 0){
             dc_times++;
         }
@@ -37,8 +63,8 @@ void* handle_socket_received_messages()
             dc_times++;
         }
         else {
-            handle_socket_message(buff);
             printf("Msg from server: %s\n",  buff);
+            handle_socket_message(buff);
         }
 
         usleep(MESSAGE_WAIT_TIME_USECONDS);
@@ -63,35 +89,4 @@ void send_message_to_server(char* message, int messageSize) {
 
 void close_socket() {
     close(sockfd);
-}
-  
-int init_socket()
-{
-    struct sockaddr_in servaddr;
-  
-    // socket create and varification
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        printf("socket creation failed...\n");
-        exit(0);
-    }
-    else
-        printf("Socket successfully created..\n");
-    bzero(&servaddr, sizeof(servaddr));
-  
-    // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(SERVER_IP);
-    servaddr.sin_port = htons(PORT);
-  
-    // connect the client socket to server socket
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
-        printf("connection with the server failed...\n");
-        exit(0);
-    }
-    else
-        printf("connected to the server..\n");
-  
-   
-    return 0;
 }

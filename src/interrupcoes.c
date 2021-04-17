@@ -32,12 +32,12 @@ struct timeval get_now() {
     return now;
 }
 
-void send_to_server(char* sensor, int sensor_value) {
+void send_to_server(int sensor_index, int sensor_value) {
     char message[200];
 
-    sprintf(message, "%s;%s;%i", SENSOR_CHANGE, sensor, sensor_value);
+    sprintf(message, "%s;%d;%i", SENSOR_CHANGE, sensor_index, sensor_value);
 
-    send_message_to_server(message, strlen(message) + 1);
+    send_message_to_server(message, strlen(message));
 }
 
 void handle_0() {
@@ -55,7 +55,7 @@ void handle_0() {
             printf("SENSOR_PRESENCA_SALA Rising\n");
         sensorData[0] = !sensorData[0];
 
-        send_to_server("SENSOR_PRESENCA_SALA", sensorData[0]);
+        send_to_server(0, sensorData[0]);
     }
 
     last_changes[0] = now;
@@ -76,7 +76,7 @@ void handle_1() {
             printf("SENSOR_PRESENCA_COZINHA Rising\n");
         sensorData[1] = !sensorData[1];
 
-        send_to_server("SENSOR_PRESENCA_COZINHA", sensorData[1]);
+        send_to_server(1, sensorData[1]);
     }
 
     last_changes[1] = now;
@@ -97,7 +97,7 @@ void handle_2() {
             printf("SENSOR_ABERTURA_PORTA_COZINHA Rising\n");
         sensorData[2] = !sensorData[2];
 
-        send_to_server("SENSOR_ABERTURA_PORTA_COZINHA", sensorData[2]);
+        send_to_server(2, sensorData[2]);
     }
 
     last_changes[2] = now;
@@ -118,7 +118,7 @@ void handle_3() {
             printf("SENSOR_ABERTURA_JANELA_COZINHA Rising\n");
         sensorData[3] = !sensorData[3];
 
-        send_to_server("SENSOR_ABERTURA_JANELA_COZINHA", sensorData[3]);
+        send_to_server(3, sensorData[3]);
     }
 
     last_changes[3] = now;
@@ -139,7 +139,7 @@ void handle_4() {
             printf("SENSOR_ABERTURA_PORTA_SALA Rising\n");
         sensorData[4] = !sensorData[4];
 
-        send_to_server("SENSOR_ABERTURA_PORTA_SALA", sensorData[4]);
+        send_to_server(4, sensorData[4]);
     }
 
     last_changes[4] = now;
@@ -160,7 +160,7 @@ void handle_5() {
             printf("SENSOR_ABERTURA_JANELA_SALA Rising\n");
         sensorData[5] = !sensorData[5];
 
-        send_to_server("SENSOR_ABERTURA_JANELA_SALA", sensorData[5]);
+        send_to_server(5, sensorData[5]);
     }
 
     last_changes[5] = now;
@@ -181,7 +181,7 @@ void handle_6() {
             printf("SENSOR_ABERTURA_JANELA_QUARTO_01 Rising\n");
         sensorData[6] = !sensorData[6];
 
-        send_to_server("SENSOR_ABERTURA_JANELA_QUARTO_01", sensorData[6]);
+        send_to_server(6, sensorData[6]);
     }
 
     last_changes[6] = now;
@@ -202,7 +202,7 @@ void handle_7() {
             printf("SENSOR_ABERTURA_JANELA_QUARTO_02 Rising\n");
         sensorData[7] = !sensorData[7];
 
-        send_to_server("SENSOR_ABERTURA_JANELA_QUARTO_02", sensorData[7]);
+        send_to_server(7, sensorData[7]);
     }
 
     last_changes[7] = now;
@@ -224,15 +224,25 @@ void* init_interruptions_handler() {
         wiringPiISR(sensorPins[i], INT_EDGE_BOTH, func_ptr[i]);
     }
 
-    updateSensorData();
+    update_sensor_data();
 
     while(1)
         sleep(1);
 }
 
-void updateSensorData() {
+void update_sensor_data() {
 
     for (int i = 0; i < 8; i++) {
         sensorData[i] = digitalRead(sensorPins[i]);
     }
+}
+
+void send_sensor_data_to_server() {
+    char message[200];
+    update_sensor_data();
+
+    sprintf(message, "%s;%d%d%d%d%d%d%d%d", ALL_SENSORS_STATES, sensorData[0], sensorData[1], sensorData[2], sensorData[3],
+        sensorData[4], sensorData[5], sensorData[6], sensorData[7]);
+    
+    send_message_to_server(message, strlen(message));
 }

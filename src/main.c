@@ -29,7 +29,6 @@ int main(int argc, const char * argv[]) {
     pthread_detach(thread_sockets);
     
     while(1) {
-        handle_temp_and_humidity();
         sleep(1);
     }
 
@@ -45,7 +44,7 @@ void handle_init() {
     wiringPiSetup();		
 
     /* initialize bme280 setup */
-    if (bme280Init(0x76))
+    if (bme280_init(0x76))
 	{
         printf("\nErro ao iniciar BME. Encerrando...\n");
 		exit(1); // problem - quit
@@ -65,6 +64,9 @@ void handle_init() {
     handle_file_creation();
 
     sleep(1);
+    
+    /* send sensors data to sserver */
+    send_sensor_data_to_server();
 }
 
 void handle_close() {

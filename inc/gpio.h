@@ -13,6 +13,6 @@
 void init_gpio_device(int device_type);
 void handle_gpio_device(int device_type, int intensity);
 int get_device_state(int device_type);
-
+void gpio_handle_message(char* payload);
 
 #endif /* GPIO_H_ */
