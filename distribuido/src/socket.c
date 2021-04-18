@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <netinet/in.h>
 
 #include <sys/types.h>    // AF_INET, SOCK_STREAM
@@ -63,7 +64,14 @@ void* handle_socket_received_messages()
             dc_times++;
         }
         else {
-            printf("Msg from server: %s\n",  buff);
+            char date_time[35];
+            time_t t = time(NULL);
+            
+            struct tm dtm = *localtime(&t);
+            sprintf(date_time, "%d-%02d-%02d %02d:%02d:%02d", 
+                dtm.tm_year + 1900, dtm.tm_mon + 1, dtm.tm_mday, dtm.tm_hour, dtm.tm_min, dtm.tm_sec);
+            
+            printf("[%s] Msg from server: %s\n", date_time, buff);
             handle_socket_message(buff);
         }
 

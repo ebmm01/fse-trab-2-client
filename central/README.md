@@ -24,4 +24,17 @@ E siga as instruções de uso.
 
 ### Utilização
 
-O servidor distribuído não requer nenhuma configuração especial para sua utilização. Ele é autônomo, recebendo comandos do servidor central e enviando respostas e mensagens push para o mesmo. Periódicamente ele printa no terminal as mensagens recebidas pelo servidor central e outros tipos de log. Vale salientar que o servidor distribuído só deve ser iniciado após o servidor central.
+O servidor central possui um menu com três seções:
+
+![](../images/central.png)
+
+A seção __Status dos sensores__ possui dados dos sensores que são enviados (após solicitação ou via push) pelo servidor distribuído. Os sensores possuem três possíveis valores:
+
+- __Aguardando dados do client__: quando o servidor distribuído não está conectado, não sendo possível determiná-los;
+- __Ocioso__: quando os sensores não estão detectando nenhum input (valor 0);
+- __Detectando__: quando os sensores estão detectando um input (valor 1);
+
+Já a seção __Menu__ permite controlar as lâmpadas e ar-condicionados, bastando pressionar a tecla numérica indicada.
+
+Por fim, a seção __Eventos recentes__ mostra uma mensagem com o evento mais recente ocorrido.
+

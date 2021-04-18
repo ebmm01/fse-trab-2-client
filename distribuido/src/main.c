@@ -71,7 +71,7 @@ void handle_init() {
 
 void handle_close() {
     printf("\nEncerrando execução...\n");
-
+    close_bme();
     pthread_cancel(thread_interruptions);
     pthread_cancel(thread_sockets);
     close_socket();

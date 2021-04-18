@@ -203,3 +203,7 @@ void get_temperature_and_humidity(float *temperature, float *humidity) {
 	*temperature = (float) T/100;
 	*humidity = (float) H/836;
 }
+
+void close_bme() {
+	close(file_i2c);
+}
