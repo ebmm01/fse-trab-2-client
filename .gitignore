@@ -55,6 +55,7 @@ dkms.conf
 *.csv
 
 # Binary
-bin/bin
+central/bin/bin
+distribuido/bin/bin
 
 .vscode/

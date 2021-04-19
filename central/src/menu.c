@@ -153,6 +153,6 @@ void* execute_menu() {
         mvwprintw(terminalData, 0, 2, "%s", "Eventos recentes");
         mvwprintw(terminalData, 1, 2, "%s", terminal_messages);
         
-        usleep(10000);
+        usleep(200000);
     }
 }

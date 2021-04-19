@@ -12,11 +12,11 @@
 
 #include "socket_handler.h"
 
-#define MAX 80
+#define MAX 200
 #define PORT 10003
 #define SA struct sockaddr
 #define SERVER_IP "192.168.0.53"
-#define MESSAGE_WAIT_TIME_USECONDS 100000
+#define MESSAGE_WAIT_TIME_USECONDS 150000
 
 
 int sockfd;

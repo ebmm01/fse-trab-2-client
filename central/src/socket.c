@@ -13,7 +13,7 @@
 
 #define PORT 10003
 #define SERVER_IP "192.168.0.53"
-#define MESSAGE_WAIT_TIME_USECONDS 100000
+#define MESSAGE_WAIT_TIME_USECONDS 150000
 #define MAX_ACCEPTED_NO_MESSAGES 20 // ou 2 segundos sem receber nenhuma mensagem
 
 struct sockaddr_in server_addr, client_addr;
@@ -87,7 +87,7 @@ void handle_messages() {
 
     sprintf(terminal_messages, "Servidor distribuido connectado::  IP: %s e porta: %d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
     
-    for (;;) {
+    while(1) {
         bzero(client_message, 2000);
 
         if (dc_times > MAX_ACCEPTED_NO_MESSAGES)
